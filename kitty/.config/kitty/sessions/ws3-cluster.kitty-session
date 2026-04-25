@@ -1,0 +1,9 @@
+# Cluster pane for workspace 3 (dashboard): k9s and btop as two tabs in the
+# same window. Switch between them with kitty's default ctrl+shift+right /
+# ctrl+shift+left (next_tab/previous_tab) - no extra keybinds needed.
+layout stack
+launch --title "k9s" k9s
+
+new_tab btop
+layout stack
+launch --title "btop" btop
