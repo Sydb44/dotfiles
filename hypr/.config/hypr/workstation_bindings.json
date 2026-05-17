@@ -1,0 +1,38 @@
+{
+  "grid": {
+    "top_left": {
+      "up": "term",
+      "left": "lazygit",
+      "down": "firefox",
+      "right": "dolphin"
+    },
+    "top_right": {
+      "up": "cursor",
+      "left": "firefox",
+      "down": "term",
+      "right": "dolphin"
+    },
+    "bottom_left": {
+      "up": "yazi",
+      "left": "local-agent",
+      "down": "term",
+      "right": "btop"
+    },
+    "bottom_right": {
+      "up": "discord",
+      "left": "spotify",
+      "down": "term",
+      "right": "lazygit"
+    }
+  },
+  "half": {
+    "left": {
+      "left": "term",
+      "right": "firefox"
+    },
+    "right": {
+      "left": "term",
+      "right": "spotify"
+    }
+  }
+}

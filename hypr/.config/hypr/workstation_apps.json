@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "apps": {
+    "term": {
+      "label": "Terminal",
+      "classes": [],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["kitty"] }
+    },
+    "firefox": {
+      "label": "Firefox",
+      "classes": ["firefox"],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["firefox"] }
+    },
+    "cursor": {
+      "label": "Cursor",
+      "classes": ["cursor", "Cursor"],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["cursor"] }
+    },
+    "local-agent": {
+      "label": "Local Agent",
+      "classes": [],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["kitty", "--title", "local-agent", "-e", "opencode"] }
+    },
+    "grafana": {
+      "label": "Grafana",
+      "classes": ["firefox"],
+      "runtime": { "type": "native" },
+      "entrypoint": {
+        "argv": ["/home/syd/.config/hypr/scripts/grafana-launch.sh"]
+      }
+    },
+    "uptime-kuma": {
+      "label": "Uptime Kuma",
+      "classes": ["firefox"],
+      "runtime": { "type": "native" },
+      "entrypoint": {
+        "argv": ["firefox", "--new-instance", "--profile", "/home/syd/.mozilla/firefox/workstation-profiles/uptime-kuma-ui", "--new-window", "https://status.silion.dev/"]
+      }
+    },
+    "dolphin": {
+      "label": "Dolphin",
+      "classes": ["dolphin", "org.kde.dolphin"],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["dolphin", "--new-window", "/home/syd"] }
+    },
+    "btop": {
+      "label": "btop",
+      "classes": [],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["kitty", "-e", "btop"] }
+    },
+    "bottom": {
+      "label": "Bottom",
+      "classes": [],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["kitty", "-e", "/usr/bin/btm"] }
+    },
+    "steam": {
+      "label": "Steam",
+      "classes": ["steam", "Steam"],
+      "runtime": { "type": "steam" },
+      "entrypoint": { "argv": ["/usr/bin/steam"] }
+    },
+    "spotify": {
+      "label": "Spotify",
+      "classes": ["spotify", "Spotify"],
+      "runtime": { "type": "native" },
+      "env": { "LD_PRELOAD": "/usr/lib/spotify-adblock.so" },
+      "entrypoint": { "argv": ["spotify", "--enable-features=UseOzonePlatform", "--ozone-platform=wayland"] }
+    },
+    "discord": {
+      "label": "Discord",
+      "classes": ["discord", "Discord"],
+      "runtime": { "type": "native" },
+      "entrypoint": { "argv": ["discord", "--enable-features=UseOzonePlatform", "--ozone-platform=wayland"] }
+    }
+  }
+}
