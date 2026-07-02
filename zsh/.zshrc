@@ -21,6 +21,15 @@ compinit
 # Starship prompt
 eval "$(starship init zsh)"
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
 export KUBECONFIG=~/.kube/config
 export PATH="$(npm config get prefix)/bin:$PATH"
+
+# jump into a persistent tmux session running claude, mainly for phone/mosh
+# use over an unstable connection - survives disconnects, screen lock, etc.
+claude-mobile() {
+    tmux attach -t claude 2>/dev/null || tmux new -s claude claude
+}
+
+if [[ -n "$SSH_CONNECTION" && -z "$TMUX" ]]; then
+    echo "tip: run 'claude-mobile' for a persistent claude session that survives dropped connections"
+fi
