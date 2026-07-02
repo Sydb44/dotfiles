@@ -174,7 +174,6 @@ def ensure_null_sink_loaded(state):
     if any(s["name"] == NULL_SINK_NAME for s in sinks):
         return state
 
-    # Load a null sink via pipewire-pulse
     res = run(
         [
             "pactl",
@@ -188,7 +187,6 @@ def ensure_null_sink_loaded(state):
     module_id = (res.stdout or "").strip()
     if module_id.isdigit():
         state["null_module_id"] = int(module_id)
-    # Give PipeWire a moment to register it
     time.sleep(0.1)
     return state
 
@@ -211,13 +209,11 @@ def unload_null_sink_if_loaded(state):
 
 
 def choose_restore_sink(state):
-    # Prefer the previously remembered sink if it still exists.
     previous = state.get("previous_default_sink")
     sink_names = [s["name"] for s in list_sinks()]
     if isinstance(previous, str) and previous in sink_names and previous != NULL_SINK_NAME:
         return previous
 
-    # Fallback: pick the first real sink (non-null).
     for name in sink_names:
         if name != NULL_SINK_NAME:
             return name
@@ -228,7 +224,6 @@ def enable():
     state = load_state()
     info = pactl_info()
     default_sink = info.get("Default Sink", "")
-    # Only capture "previous" sink if it's a real output.
     if default_sink and default_sink != NULL_SINK_NAME:
         state["previous_default_sink"] = default_sink
 
@@ -236,7 +231,6 @@ def enable():
     set_default_sink(NULL_SINK_NAME)
     move_all_inputs_to(NULL_SINK_NAME)
 
-    # Blank physical monitor without breaking KMS capture (best-effort).
     state["monitor_blanked"] = bool(blank_monitor_hardware(True, state))
 
     state["enabled_at"] = int(time.time())
@@ -247,8 +241,6 @@ def enable():
 def disable():
     state = load_state()
     restore_sink = choose_restore_sink(state)
-
-    # Restore physical monitor (best-effort)
     blank_monitor_hardware(False, state)
 
     if isinstance(restore_sink, str) and restore_sink:

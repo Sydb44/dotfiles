@@ -38,10 +38,8 @@ RESTORE_DELAY = 0.35
 POSITION_TOLERANCE = 10
 BOTTOM_WIDTH_RATIO = 937 / 1208
 
-# Reference canvas this whole layout was originally tuned against (2560x1440).
-# Every margin/gap/default below is expressed as a ratio of that reference so
-# it scales proportionally to whatever monitor is actually hosting workspace 1
-# (TV, laptop panel, ultrawide, whatever) instead of being pinned to one size.
+# everything below scales off this 2560x1440 reference so it still looks
+# right on whatever monitor workspace 1 actually ends up on
 _REF_W = 2560
 _REF_H = 1440
 _REF_OUTER_LEFT = 48
@@ -896,13 +894,8 @@ def workstation_plugin_loaded():
 
 
 def sync_plugin_grid(state):
-    # The native hyprworkstation plugin is a vestigial scaffold, not the
-    # active live-resize engine (see CLAUDE.md). Its geometry constants are
-    # still hardcoded to the old 2560x1440 monitor and were never migrated
-    # to the dynamic per-monitor scaling the rest of this file uses, so
-    # feeding it live grid updates makes it clamp/misplace windows on the
-    # real 3840x2160 screen right after the correct placement is applied —
-    # visible as a flash-to-top-left-then-snap-back on every resize.
+    # native plugin still has the old monitor size hardcoded, feeding it
+    # live updates just makes windows flash to the wrong spot
     return
     if not workstation_plugin_loaded():
         return
@@ -929,11 +922,8 @@ def clamp(value, low, high):
 def normalized_meta(raw=None):
     raw = raw or {}
     c = layout_constants()
-    # If the monitor changed since these pixel values were last saved (new
-    # screen, different resolution/scale), a stale absolute-pixel preference
-    # clamped against the new bounds tends to land lopsided at one edge
-    # instead of staying visually centered. Detect that and re-center to the
-    # new proportional default instead of just clamping.
+    # if the monitor changed, re-center instead of clamping the old pixel
+    # values (clamping alone leaves it lopsided against the new bounds)
     screen_changed = (
         raw.get("screen_w") != c["sw"] or raw.get("screen_h") != c["sh"]
     )
@@ -1101,10 +1091,8 @@ def save_runtime(runtime):
         "true_fullscreen_slot": runtime.get("true_fullscreen_slot"),
         "grid_left_width": runtime.get("grid_left_width", current_meta.get("grid_left_width", layout_constants()["default_left_w"])),
         "grid_top_height": runtime.get("grid_top_height", current_meta.get("grid_top_height", layout_constants()["default_top_h"])),
-        # Must carry these through: normalized_meta() treats a missing/mismatched
-        # screen_w/screen_h as "monitor changed" and force-resets the grid split
-        # back to its default. Omitting them here silently clobbered every
-        # drag-resize back to center right after it was saved.
+        # without these normalized_meta thinks the monitor changed and
+        # resets the grid split back to default on every save
         "screen_w": current_meta.get("screen_w"),
         "screen_h": current_meta.get("screen_h"),
     })
@@ -1235,13 +1223,8 @@ def clients():
 
 
 def client_by_address(address, current_clients=None, expected_classes=None):
-    # Hyprland client "address" is the window object's memory address - once a
-    # window closes, nothing stops a later, completely unrelated window from
-    # getting allocated at that exact same address. A stale profile entry that
-    # skipped cleanup can then look "still alive" and get treated as the old
-    # window, silently hijacking whatever now lives at that address. Pass
-    # expected_classes whenever the caller is validating a *cached* profile
-    # address (not a freshly-resolved one) to guard against that.
+    # addresses get reused after a window closes, so a stale cached one can
+    # match a totally different window - pass expected_classes to catch that
     current_clients = current_clients if current_clients is not None else clients()
     for client in current_clients:
         if client.get("address") == address and client.get("mapped"):
@@ -2367,7 +2350,6 @@ def swap_slots(from_slot, to_slot, state):
     from_profile = from_state.get("active_profile") or SLOTS[from_slot]["profile"]
     to_profile = to_state.get("active_profile") or SLOTS[to_slot]["profile"]
 
-    # Physically move windows to each other's geometry
     if from_addr and client_by_address(from_addr):
         place_in_slot(from_addr, to_slot)
         if is_firefox_profile(from_profile):
@@ -2380,21 +2362,18 @@ def swap_slots(from_slot, to_slot, state):
             time.sleep(0.45)
             place_in_slot(to_addr, from_slot)
 
-    # Swap profile records between slots
     from_profile_data = dict(from_state.get("profiles", {}).get(from_profile, {}))
     to_profile_data = dict(to_state.get("profiles", {}).get(to_profile, {}))
 
     from_state.setdefault("profiles", {})
     to_state.setdefault("profiles", {})
 
-    # from_slot inherits to_slot's active profile
     from_state["profiles"].pop(from_profile, None)
     if to_profile_data:
         from_state["profiles"][to_profile] = to_profile_data
     from_state["active_profile"] = to_profile
     from_state["active_profile_id"] = to_profile_data.get("profile_id")
 
-    # to_slot inherits from_slot's active profile
     to_state["profiles"].pop(to_profile, None)
     if from_profile_data:
         to_state["profiles"][from_profile] = from_profile_data

@@ -1,19 +1,7 @@
 #!/usr/bin/env python3
-# Workspace 3: the ops dashboard. Four apps, launched once and moved onto
-# workspace 3 by tracked address (not windowrule title-matching, which
-# would be fragile against any other Firefox window sharing a title
-# fragment). Placement is a one-shot symmetric 2x2 float layout computed
-# from the real monitor geometry at launch time - it reuses
-# workspace1_manager.py's own monitor-detection so it can't regress into
-# the same hardcoded-2560x1440 bug that hit the main grid. There is no
-# persistent daemon for this workspace: it's a glance-and-leave surface,
-# not something dragged/resized live, so static placement is enough.
-#
-# Grafana and Uptime Kuma reuse the existing registry apps
-# (workstation_apps.json) rather than hand-rolled Firefox invocations - the
-# grafana entry runs scripts/grafana-launch.sh, which opens the actual
-# homelab-overview dashboard in kiosk mode with a curl warmup, not just a
-# bare URL.
+# workspace 3 is the ops dashboard - k9s/btop, grafana, uptime-kuma, gitea
+# actions, laid out in a static 2x2 grid. no live daemon for this one since
+# it's just a glance-and-leave screen, not something you drag around.
 import importlib.util
 import subprocess
 import sys
@@ -76,11 +64,9 @@ def place(address, rect):
 
 
 def find_existing_by_profile(profile_substr):
-    # grafana-ui/uptime-kuma-ui are pre-existing dedicated profiles this
-    # rice already uses elsewhere (they were live as slot content on the
-    # old grid). Firefox profile-locks a directory to one running process,
-    # so if one of these is already alive we must move it, not spawn a
-    # second instance against the same profile (which would just fail).
+    # firefox locks a profile dir to one process, so if grafana-ui or
+    # uptime-kuma-ui is already running somewhere we move it instead of
+    # trying to spawn a second instance against the same profile
     for c in m.clients():
         pid = c.get("pid")
         if not pid or not c.get("mapped"):

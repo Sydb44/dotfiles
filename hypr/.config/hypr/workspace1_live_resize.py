@@ -15,10 +15,8 @@ META_FILE = Path.home() / ".cache/hypr/workspace1_meta.json"
 USER_RUNTIME_DIR = f"/run/user/{os.getuid()}"
 DEBUG_LOG = Path("/tmp/workspace1-live-resize-debug.log")
 TRACE_LOG = Path("/tmp/workspace1-live-resize-trace.jsonl")
-# Reference canvas this layout was tuned against (2560x1440); everything is
-# scaled proportionally to whatever monitor is actually hosting workspace 1,
-# mirroring workspace1_manager.py's layout_constants() so drag-time geometry
-# matches settle-time geometry on any resolution.
+# mirrors workspace1_manager.py's layout_constants() so drag-time geometry
+# matches where things actually settle
 _REF_W = 2560
 _REF_H = 1440
 _REF_OUTER_LEFT = 48

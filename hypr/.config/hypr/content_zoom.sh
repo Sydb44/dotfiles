@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# SUPER + numpad +/-        : bump content size (font/page zoom) on every window
-# SUPER + SHIFT + numpad +/-: bump content size on only the focused window
-# Never touches window geometry - routes to each app's own native zoom
-# shortcut so it stays smooth/incremental.
+# bumps font/page zoom on windows without touching their size - super+numpad
+# does every window, super+shift+numpad only the focused one
 set -euo pipefail
 
 direction="${1:-}"
@@ -22,7 +20,7 @@ zoom_one() {
     local key
     case "$class" in
         kitty|ws1-*)
-            # kitty's built-in default binds (kitty_mod = ctrl+shift)
+            # kitty defaults to ctrl+shift for these
             case "$direction" in
                 in) key="equal" ;;
                 out) key="minus" ;;
@@ -31,9 +29,7 @@ zoom_one() {
             hyprctl dispatch sendshortcut "CTRL_SHIFT,${key},address:${address}" >/dev/null
             ;;
         *)
-            # Common ctrl+=/ctrl+-/ctrl+0 zoom convention: Firefox, Chromium,
-            # most Electron apps (Discord, VSCode, Spotify web UI), many
-            # GTK/Qt apps.
+            # everything else (firefox, discord, most electron/gtk apps) uses plain ctrl
             case "$direction" in
                 in) key="equal" ;;
                 out) key="minus" ;;

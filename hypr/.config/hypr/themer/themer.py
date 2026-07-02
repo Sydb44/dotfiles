@@ -178,7 +178,7 @@ class HyprThemer(Gtk.ApplicationWindow):
         root.append(self.save_btn)
         self.set_child(root)
 
-    # ── helpers ──────────────────────────────────────────────────────────────
+    # helpers
 
     def load_from_conf(self):
         try:
@@ -295,7 +295,7 @@ class HyprThemer(Gtk.ApplicationWindow):
         row.append(val_lbl)
         return row
 
-    # ── apply fns ────────────────────────────────────────────────────────────
+    # apply fns
 
     def _apply_active_border(self):
         hyprctl("general:col.active_border",
@@ -311,7 +311,7 @@ class HyprThemer(Gtk.ApplicationWindow):
         hyprctl("decoration:shadow:range",          str(self.state['shadow_range']))
         hyprctl("decoration:shadow:render_power",   str(self.state['shadow_render_power']))
 
-    # ── tabs ─────────────────────────────────────────────────────────────────
+    # tabs
 
     def build_tab_borders(self):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -376,7 +376,7 @@ class HyprThemer(Gtk.ApplicationWindow):
             lambda: hyprctl("general:gaps_out", str(self.state['gaps_out']))))
         return self.scrollwrap(box)
 
-    # ── save ─────────────────────────────────────────────────────────────────
+    # save
 
     def save_to_conf(self, _btn):
         try:
