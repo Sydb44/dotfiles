@@ -1,51 +1,7 @@
 # dotfiles
 
-Arch/Hyprland dotfiles, managed with [stow](https://www.gnu.org/software/stow/). Each top-level folder is a stow package.
+Arch/Hyprland dotfiles, managed with [stow](https://www.gnu.org/software/stow/). Each top-level folder is a stow package, so `cd ~/dotfiles && stow zsh hypr kitty nvim starship waybar dunst` symlinks everything into place. Covers zsh, Hyprland (plus hypridle/hyprlock/hyprpaper and the window manager described below), kitty, a LazyVim-based Neovim setup, the starship prompt, waybar, and dunst.
 
-```bash
-cd ~/dotfiles
-stow zsh hypr kitty nvim starship waybar dunst
-```
+The desktop isn't run as a normal tiling setup. Workspace 2, the main work area, is driven by `workspace1_manager.py`, a Python daemon that manages a fixed 4-slot grid of floating windows (plus a 2-panel "half" mode), where each slot switches between different apps via directional gestures instead of manual window placement. The daemon tracks which app is active in each slot, handles switching and parking windows — closing a slot doesn't kill the app, it gets moved to a hidden named workspace so switching back is instant — and corrects drift if a window gets moved or resized outside the manager. New apps get added through a small registry rather than touching the grid logic directly. A separate script, `workspace1_live_resize.py`, runs a 60fps watcher just for live drag-resizing the grid split, kept apart from the daemon so dragging stays smooth. There's also `workspace1_plugin_dispatch.py`, which bridges into a small native Hyprland plugin that's not currently driving placement but is kept around for later. The actual gesture UI — the radial pie menus, drag handles, app picker — lives in a Quickshell/QML layer that talks to the daemon over its CLI. Grid geometry is computed from whatever monitor is actually active rather than hardcoded, so it holds up across different resolutions instead of only working on one screen.
 
-## What's in here
-
-- `zsh` — shell config
-- `hypr` — Hyprland, hypridle, hyprlock, hyprpaper, plus the workspace1 window manager (below)
-- `kitty` — terminal config and themes
-- `nvim` — LazyVim-based Neovim config
-- `starship` — prompt
-- `waybar` — status bar
-- `dunst` — notifications
-
-## workspace1: a second window manager on top of Hyprland
-
-The desktop isn't run as a normal tiling setup. Workspace 2 (the main work
-area) is driven by `workspace1_manager.py`, a Python daemon that manages a
-fixed 4-slot grid (plus a 2-panel "half" mode) of floating windows, each
-slot swappable between different apps via directional gestures instead of
-manual window placement.
-
-Rough shape of it:
-
-- `workspace1_manager.py` — the daemon and CLI. Tracks which app is active
-  in each slot, handles switching/parking windows (closed apps get moved to
-  a hidden named workspace instead of killed, so switching back is instant),
-  drift correction (snaps a window back if it gets moved/resized outside
-  the manager), and a small app registry so new apps can be added without
-  touching the grid logic.
-- `workspace1_live_resize.py` — a 60fps watcher that handles live drag-resize
-  of the grid split, separate from the daemon so dragging stays smooth.
-- `workspace1_plugin_dispatch.py` — bridges into a small native Hyprland
-  plugin (kept for future work, not currently driving placement).
-- The actual gesture UI (the radial pie menus, drag handles, app picker)
-  lives in a Quickshell/QML layer that talks to this daemon over its CLI.
-
-The grid geometry is computed from whatever monitor is actually active
-(`hyprctl monitors`), scaled from a 2560x1440 reference, so it holds up on
-different resolutions instead of being hardcoded to one screen.
-
-## Third workspace
-
-Workspace 1 is dedicated to gaming (Steam/Discord), workspace 3 is a static
-ops dashboard (cluster status, Grafana, Uptime Kuma, CI status) launched by
-`launch-workspace3.py`.
+The other two workspaces are simpler. Workspace 1 is dedicated to gaming (Steam and Discord land there automatically), and workspace 3 is a static ops dashboard — cluster status, Grafana, Uptime Kuma, CI status — launched by `launch-workspace3.py`.
