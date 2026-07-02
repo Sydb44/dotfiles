@@ -27,7 +27,7 @@ export PATH="$(npm config get prefix)/bin:$PATH"
 # jump into a persistent tmux session running claude, mainly for phone/mosh
 # use over an unstable connection - survives disconnects, screen lock, etc.
 claude-mobile() {
-    tmux attach -t claude 2>/dev/null || tmux new -s claude claude
+    tmux attach -t claude 2>/dev/null || tmux new -s claude "claude -r"
 }
 
 if [[ -n "$SSH_CONNECTION" && -z "$TMUX" ]]; then
